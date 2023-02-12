@@ -21,10 +21,14 @@ fn main() {
             }
         }
         None => {
-            println!("Please specify the word");
-            process::exit(1)
+            end("Please specify the word");
         }
     }
+}
+
+fn end(msg: &str) {
+    println!("{}", msg);
+    process::exit(1);
 }
 
 fn print(v: &Vec<Value>, raw: &Value) {
@@ -44,11 +48,11 @@ fn get_data(collection: String) -> Value {
     match fs::read_to_string(file_path) {
         Ok(x) => return parse(&x, collection),
         Err(_) => {
-            println!(
+            end(&format!(
                 "data/{}.json not found, maybe the dictionary was deleted",
                 collection
-            );
-            process::exit(1);
+            ));
+            return Value::Null;
         }
     }
 }
@@ -57,11 +61,11 @@ fn parse(json_string: &str, collection: String) -> Value {
     match from_str(json_string) {
         Ok(y) => return y,
         Err(_) => {
-            println!(
+            end(&format!(
                 "data/{}.json failed to parse, maybe someone tampured the dictionary files",
                 collection
-            );
-            process::exit(1);
+            ));
+            return Value::Null;
         }
     }
 }
@@ -74,8 +78,8 @@ fn collection(word: &str) -> String {
             return x.to_string();
         }
         None => {
-            println!("Word must have atleast 1 character");
-            process::exit(1)
+            end("Word must have atleast 1 character");
+            return String::new();
         }
     }
 }
