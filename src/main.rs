@@ -1,7 +1,6 @@
+use colored::*;
 use serde_json::{from_str, Value};
-use std::env;
-use std::fs;
-use std::process;
+use std::{env, fs, process};
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -32,6 +31,7 @@ fn end(msg: &str) {
     process::exit(1);
 }
 
+#[derive(Clone)]
 pub struct Defination {
     pub part_of_speech: String,
     pub category: String,
@@ -114,10 +114,15 @@ fn pad(str: &String, new_len: &usize) -> String {
     str.to_owned() + &" ".repeat(new_len - str.len())
 }
 
-fn table_print(data: &Vec<Defination>) {
-    let mut max_part_of_speech: usize = 0;
-    let mut max_category: usize = 0;
-    let mut max_explanation: usize = 0;
+fn table_print(old_data: &Vec<Defination>) {
+    let mut data = vec![];
+    data.reserve(old_data.len() + 1);
+    for cell in old_data.iter() {
+        data.push(cell.clone());
+    }
+    let mut max_part_of_speech: usize = 14;
+    let mut max_category: usize = 8;
+    let mut max_explanation: usize = 11;
     for cell in data.iter() {
         max_part_of_speech = max(cell.part_of_speech.len(), max_part_of_speech);
         max_category = max(cell.category.len(), max_category);
@@ -134,6 +139,13 @@ fn table_print(data: &Vec<Defination>) {
         "-".repeat(max_part_of_speech),
         "-".repeat(max_category),
         "-".repeat(max_explanation)
+    );
+    println!("{}", barrier);
+    println!(
+        "|{}|{}|{}|",
+        "Part of speech".bold().to_string() + &" ".repeat(max_part_of_speech - 14),
+        "Category".bold().to_string() + &" ".repeat(max_category - 8),
+        "Explanation".bold().to_string() + &" ".repeat(max_explanation - 11)
     );
     println!("{}", barrier);
     for cell in data.iter() {
