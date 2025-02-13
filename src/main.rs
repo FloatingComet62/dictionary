@@ -63,7 +63,7 @@ fn filter(v: &Vec<Value>, raw: &Value) -> Vec<Defination> {
 }
 
 fn get_data(collection: String) -> Value {
-    let file_path = format!("C:\\Users\\shubh\\.dictionary\\{}.json", collection);
+    let file_path = format!("{}\\.dictionary\\{}.json", env::home_dir(), collection);
     match fs::read_to_string(file_path) {
         Ok(x) => return parse(&x, collection),
         Err(_) => {
