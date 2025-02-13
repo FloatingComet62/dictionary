@@ -1,8 +1,11 @@
 use colored::*;
 use serde_json::{from_str, Value};
 use std::{env, fs, process};
+use home::home_dir;
 
 fn main() {
+    let path = home_dir().unwrap();
+    println!("Home dir: {:?}", path.display());
     let args: Vec<_> = env::args().collect();
     let word = args.get(1);
     match word {
@@ -63,13 +66,15 @@ fn filter(v: &Vec<Value>, raw: &Value) -> Vec<Defination> {
 }
 
 fn get_data(collection: String) -> Value {
-    let file_path = format!("{}\\.dictionary\\{}.json", env::home_dir(), collection);
-    match fs::read_to_string(file_path) {
+    let mut path = home_dir().unwrap();
+    path.push(".dictionary");
+    path.push(format!("{}.json", collection));
+    match fs::read_to_string(&path) {
         Ok(x) => return parse(&x, collection),
         Err(_) => {
             end(&format!(
-                "data/{}.json not found, maybe the dictionary was deleted",
-                collection
+                "{} not found, maybe the dictionary was deleted",
+                path.display()
             ));
             return Value::Null;
         }
